@@ -1,0 +1,8 @@
+{
+  "/api/ping/route": "app/api/ping/route.js",
+  "/api/virtual-try-on/test/route": "app/api/virtual-try-on/test/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/virtual-try-on/route": "app/api/virtual-try-on/route.js",
+  "/page": "app/page.js"
+}
