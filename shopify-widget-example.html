@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On Widget - Shopify Integration</title>
+    <style>
+        .virtual-try-on-widget {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .widget-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .widget-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .widget-subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .upload-area:hover {
+            border-color: #3b82f6;
+        }
+        
+        .upload-area.required {
+            border-color: #ef4444;
+        }
+        
+        .upload-area.required:hover {
+            border-color: #dc2626;
+        }
+        
+        .upload-label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .upload-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .upload-button:hover {
+            background: #2563eb;
+        }
+        
+        .generate-button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .generate-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .result-section {
+            text-align: center;
+            min-height: 300px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .download-button {
+            background: #059669;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 15px;
+        }
+        
+        .download-button:hover {
+            background: #047857;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="virtual-try-on-widget">
+        <div class="widget-header">
+            <h2 class="widget-title">Virtual Try-On</h2>
+            <p class="widget-subtitle">Isprobajte odeću na sebi koristeći AI tehnologiju</p>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-area required" id="userPhotoArea">
+                <label class="upload-label">Vaša fotografija *</label>
+                <input type="file" id="userPhoto" accept="image/*" style="display: none;">
+                <button class="upload-button" onclick="document.getElementById('userPhoto').click()">
+                    Upload fotografije
+                </button>
+            </div>
+            
+            <div class="upload-area" id="clothingPhotoArea">
+                <label class="upload-label">Fotografija odeće (opciono)</label>
+                <input type="file" id="clothingPhoto" accept="image/*" style="display: none;">
+                <button class="upload-button" onclick="document.getElementById('clothingPhoto').click()">
+                    Upload odeće
+                </button>
+            </div>
+        </div>
+        
+        <button class="generate-button" id="generateBtn" onclick="generateVirtualTryOn()" disabled>
+            Generiši Virtual Try-On
+        </button>
+        
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        
+        <div class="result-section" id="resultSection">
+            <div style="color: #6b7280;">
+                <p>Uploadujte fotografiju i kliknite "Generiši"</p>
+                <p style="font-size: 14px; margin-top: 8px;">Rezultat će se prikazati ovde</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userPhoto = null;
+        let clothingPhoto = null;
+        
+        // Handle file uploads
+        document.getElementById('userPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                userPhoto = file;
+                updateUploadArea('userPhotoArea', file, true);
+                updateGenerateButton();
+            }
+        });
+        
+        document.getElementById('clothingPhoto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                clothingPhoto = file;
+                updateUploadArea('clothingPhotoArea', file, false);
+            }
+        });
+        
+        function updateUploadArea(areaId, file, isRequired) {
+            const area = document.getElementById(areaId);
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                area.innerHTML = `
+                    <label class="upload-label">${isRequired ? 'Vaša fotografija *' : 'Fotografija odeće (opciono)'}</label>
+                    <img src="${e.target.result}" alt="Preview" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; margin: 10px 0;">
+                    <br>
+                    <button class="upload-button" onclick="removePhoto('${areaId}', ${isRequired})" style="background: #ef4444;">
+                        Ukloni sliku
+                    </button>
+                `;
+                
+                if (isRequired) {
+                    area.classList.remove('required');
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function removePhoto(areaId, isRequired) {
+            const area = document.getElementById(areaId);
+            const inputId = areaId === 'userPhotoArea' ? 'userPhoto' : 'clothingPhoto';
+            
+            if (areaId === 'userPhotoArea') {
+                userPhoto = null;
+                area.classList.add('required');
+            } else {
+                clothingPhoto = null;
+            }
+            
+            document.getElementById(inputId).value = '';
+            area.innerHTML = `
+                <label class="upload-label">${isRequired ? 'Vaša fotografija *' : 'Fotografija odeće (opciono)'}</label>
+                <input type="file" id="${inputId}" accept="image/*" style="display: none;">
+                <button class="upload-button" onclick="document.getElementById('${inputId}').click()">
+                    Upload ${isRequired ? 'fotografije' : 'odeće'}
+                </button>
+            `;
+            
+            updateGenerateButton();
+        }
+        
+        function updateGenerateButton() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = !userPhoto;
+        }
+        
+        async function generateVirtualTryOn() {
+            if (!userPhoto) {
+                showError('Molimo uploadujte svoju fotografiju');
+                return;
+            }
+            
+            const generateBtn = document.getElementById('generateBtn');
+            const resultSection = document.getElementById('resultSection');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generisanje...';
+            errorMessage.style.display = 'none';
+            
+            resultSection.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generisanje slike...</p>
+                </div>
+            `;
+            
+            try {
+                const formData = new FormData();
+                formData.append('userPhoto', userPhoto);
+                
+                if (clothingPhoto) {
+                    formData.append('clothingPhoto', clothingPhoto);
+                }
+                
+                // Replace with your actual API endpoint
+                const response = await fetch('/api/virtual-try-on', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Greška pri generisanju slike');
+                }
+                
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                
+                // Show result
+                resultSection.innerHTML = `
+                    <div>
+                        <img src="${imageUrl}" alt="Generated virtual try-on" class="result-image">
+                        <br>
+                        <a href="${imageUrl}" download="virtual-try-on.png" class="download-button">
+                            Preuzmi sliku
+                        </a>
+                    </div>
+                `;
+                
+            } catch (error) {
+                showError(error.message);
+                resultSection.innerHTML = `
+                    <div style="color: #6b7280;">
+                        <p>Greška pri generisanju slike</p>
+                        <p style="font-size: 14px; margin-top: 8px;">Pokušajte ponovo</p>
+                    </div>
+                `;
+            } finally {
+                // Reset button
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generiši Virtual Try-On';
+            }
+        }
+        
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

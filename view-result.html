@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .info {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 10px;
+            transition: background 0.3s;
+        }
+        .download-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Virtual Try-On Result</h1>
+        
+        <div class="info">
+            <h3>📊 Generation Details</h3>
+            <p><strong>Model:</strong> gemini-2.5-flash-image-preview</p>
+            <p><strong>API:</strong> Gemini AI Studio</p>
+            <p><strong>Image Size:</strong> 2.06MB (2,067,037 bytes)</p>
+            <p><strong>Generation Time:</strong> 8.0 seconds</p>
+            <p><strong>Status:</strong> ✅ Success</p>
+            <p><strong>Prompt:</strong> Simple version</p>
+            <p><strong>Test:</strong> New images (deovjka + tia)</p>
+        </div>
+
+        <div class="result-section">
+            <h2>🖼️ Generated Image (New Test)</h2>
+            <img src="vto-new-test.png" alt="Virtual Try-On Result" class="result-image">
+            
+            <div style="margin-top: 20px;">
+                <a href="vto-new-test.png" download class="download-btn">⬇️ Download PNG</a>
+                <a href="assets/deovjka 1.png" download class="download-btn">👤 Download User Photo</a>
+                <a href="assets/tia.png" download class="download-btn">👕 Download Clothing Item</a>
+            </div>
+        </div>
+
+        <div class="info">
+            <h3>🔍 What Happened</h3>
+            <p>The AI model successfully combined your photo with the clothing item to create a realistic virtual try-on image. The result shows how you would look wearing that specific garment.</p>
+        </div>
+    </div>
+</body>
+</html>
