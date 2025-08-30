@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { fileToB64 } from '@/app/lib/b64';
 
@@ -10,6 +11,7 @@ async function runWithGemini(userPhoto: File, clothingPhoto?: File) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-image-preview' });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parts: any[] = [
     {
       text:
@@ -36,9 +38,11 @@ async function runWithGemini(userPhoto: File, clothingPhoto?: File) {
   const resp = await model.generateContent({ contents: [{ role: 'user', parts }] });
 
   // extract image
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cand = resp.response?.candidates?.[0];
   const outParts = cand?.content?.parts || [];
   for (const p of outParts) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const inline = (p as any).inlineData;
     if (inline?.data) {
       const mime = inline.mimeType || 'image/png';
@@ -49,6 +53,7 @@ async function runWithGemini(userPhoto: File, clothingPhoto?: File) {
 
   // if only text
   let text = '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   for (const p of outParts) if ((p as any).text) text += (p as any).text + '\n';
   return { ok: false as const, message: text || 'No image in response (Gemini).' };
 }
@@ -59,7 +64,7 @@ async function runWithVertex(userPhoto: File, clothingPhoto?: File) {
   const location = process.env.GOOGLE_LOCATION || 'global';
   const vertex = new VertexAI({ project, location });
   const model = vertex.getGenerativeModel({ model: 'gemini-2.5-flash-image-preview' });
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parts: any[] = [
     {
       text:
@@ -83,9 +88,11 @@ async function runWithVertex(userPhoto: File, clothingPhoto?: File) {
   }
 
   const res = await model.generateContent({ contents: [{ role: 'user', parts }] });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cand = (res as any).response?.candidates?.[0];
   const outParts = cand?.content?.parts || [];
   for (const p of outParts) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const inline = (p as any).inlineData;
     if (inline?.data) {
       const mime = inline.mimeType || 'image/png';
@@ -94,6 +101,7 @@ async function runWithVertex(userPhoto: File, clothingPhoto?: File) {
     }
   }
   let text = '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   for (const p of outParts) if ((p as any).text) text += (p as any).text + '\n';
   return { ok: false as const, message: text || 'No image in response (Vertex).' };
 }

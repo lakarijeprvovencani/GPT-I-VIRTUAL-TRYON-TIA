@@ -45,3 +45,6 @@ vto-*.jpg
 
 # Logs
 *.log
+
+# Local Netlify folder
+.netlify
