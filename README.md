@@ -68,8 +68,8 @@ USE_GEMINI_API=true
    ```
 
 3. **Run development server:**
-   ```bash
-   npm run dev
+```bash
+npm run dev
    ```
 
 4. **Test the API:**

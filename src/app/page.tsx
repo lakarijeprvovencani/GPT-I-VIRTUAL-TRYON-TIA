@@ -5,14 +5,14 @@ import VirtualTryOn from '@/components/VirtualTryOn';
 
 export default function Home() {
   const [context, setContext] = useState({
-    productId: null,
-    variantId: null,
-    handle: null,
-    title: null,
-    price: null,
-    image: null,
-    mode: null,
-    source: null,
+    productId: null as string | null,
+    variantId: null as string | null,
+    handle: null as string | null,
+    title: null as string | null,
+    price: null as string | null,
+    image: null as string | null,
+    mode: null as string | null,
+    source: null as string | null,
     debug: false
   });
 

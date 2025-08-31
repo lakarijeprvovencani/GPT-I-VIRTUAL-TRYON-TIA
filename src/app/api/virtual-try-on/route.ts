@@ -125,16 +125,61 @@ export async function POST(req: NextRequest) {
       console.log('[VTO] OK', useGemini ? 'GEMINI' : 'VERTEX', 'bytes=', out.buf.length, 'ms=', Date.now() - started);
       return new NextResponse(out.buf, {
         status: 200,
-        headers: { 'Content-Type': out.mime, 'Cache-Control': 'no-store' },
+        headers: { 
+          'Content-Type': out.mime, 
+          'Cache-Control': 'no-store',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
       });
     }
 
     console.warn('[VTO] NO-IMAGE', useGemini ? 'GEMINI' : 'VERTEX', out.message?.slice(0, 200));
-    return NextResponse.json({ error: out.message || 'No image.' }, { status: 502 });
+    return NextResponse.json({ error: out.message || 'No image.' }, { 
+      status: 502,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      }
+    });
   } catch (e: any) {
     // KLJUČNO: nikad HTML – uvek JSON sa detaljima!
     console.error('[VTO] ERROR', e?.message || e);
     const detail = e?.response?.data || e?.stack || String(e);
-    return NextResponse.json({ error: 'Try-on failed', detail }, { status: 500 });
+    return NextResponse.json({ error: 'Try-on failed', detail }, { 
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      }
+    });
   }
+}
+
+export async function GET() {
+  return NextResponse.json({ 
+    ok: true, 
+    message: 'Virtual Try-On API is running',
+    model: 'gemini-2.5-flash-image-preview'
+  }, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    }
+  });
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
 }
