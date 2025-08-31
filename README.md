@@ -151,10 +151,78 @@ Current working prompt:
 - No API keys exposed in frontend
 - Input validation and sanitization
 
+## 🛍️ Shopify PostMessage Integration
+
+### PostMessage Payload
+
+When virtual try-on is completed, the app sends a message to parent window:
+
+```javascript
+{
+  type: 'vto:result',
+  ready: true,
+  payload: {
+    productId: '12345',
+    variantId: '67890',
+    handle: 'product-handle',
+    title: 'Product Title',
+    price: '99.99',
+    image: 'https://example.com/product.jpg',
+    resultUrl: 'blob:https://app.com/result.png',
+    source: 'shopify'
+  }
+}
+```
+
+### Query Parameters
+
+The app accepts the following query parameters from Shopify:
+
+- `productId` - Shopify product ID
+- `variantId` - Selected variant ID
+- `handle` - Product handle for navigation
+- `title` - Product title
+- `price` - Product price (without currency)
+- `image` - Product image URL
+- `mode` - UI mode (`compact` for iframe/modal usage)
+- `source` - Source platform (`shopify`)
+- `debug` - Debug mode (`1` to show debug panel)
+
+### Example URL
+
+```
+https://gpt-virtual-tryon-tia.netlify.app?
+  mode=compact&
+  source=shopify&
+  productId=12345&
+  variantId=67890&
+  handle=tia-lorens-black-tracksuit&
+  title=TL%20Black%20Tracksuit&
+  price=8590&
+  image=https://example.com/product.jpg&
+  debug=1
+```
+
+### Compact Mode
+
+When `mode=compact`:
+- Smaller padding and margins
+- Hidden main header and subtitle
+- Single column layout
+- Optimized for iframe/modal (600px height)
+
+### Debug Mode
+
+When `debug=1`:
+- Shows floating debug panel
+- Test postMessage button
+- Context and message inspection
+- Console logging
+
 ## 🧪 Testing
 
 Test with provided sample images in `assets/` folder:
-- `deovjka 1.png` - User photo
+- `devojka 1.png` - User photo
 - `tia.png` - Clothing item
 - `zenskamajica.jpg` - Alternative clothing
 

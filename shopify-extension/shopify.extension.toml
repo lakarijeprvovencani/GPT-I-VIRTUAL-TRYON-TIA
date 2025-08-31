@@ -1,0 +1,38 @@
+name = "Virtual Try-On Widget"
+type = "theme-app-extension"
+
+[settings]
+default_shopify_managed_fields = false
+
+[capabilities]
+network_access = true
+block_progress = false
+api_access = false
+
+[extension_points]
+target = "section"
+module = "./blocks/virtual-try-on-widget.liquid"
+
+[settings]
+fields = [
+  { key = "button_text", type = "single_line_text_field" },
+  { key = "button_style", type = "select" },
+  { key = "button_color", type = "color" },
+  { key = "button_text_color", type = "color" },
+  { key = "button_border_radius", type = "range" },
+  { key = "show_product_card", type = "checkbox" },
+  { key = "card_background", type = "color" },
+  { key = "card_border_color", type = "color" },
+  { key = "card_border_radius", type = "range" },
+  { key = "modal_title", type = "single_line_text_field" },
+  { key = "modal_background", type = "color" },
+  { key = "modal_header_background", type = "color" },
+  { key = "modal_border_radius", type = "range" },
+  { key = "widget_alignment", type = "select" },
+  { key = "widget_margin_top", type = "range" },
+  { key = "widget_margin_bottom", type = "range" },
+  { key = "compact_mode", type = "checkbox" },
+  { key = "enable_animations", type = "checkbox" },
+  { key = "close_on_escape", type = "checkbox" },
+  { key = "close_on_outside_click", type = "checkbox" }
+]

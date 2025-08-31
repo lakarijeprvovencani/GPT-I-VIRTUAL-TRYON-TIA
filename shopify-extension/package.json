@@ -1,0 +1,32 @@
+{
+  "name": "virtual-try-on-widget-extension",
+  "version": "1.0.0",
+  "description": "Shopify Theme App Extension for Virtual Try-On Widget",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step required for theme app extensions'",
+    "dev": "shopify app dev",
+    "deploy": "shopify app deploy"
+  },
+  "keywords": [
+    "shopify",
+    "theme-app-extension",
+    "virtual-try-on",
+    "ai",
+    "fashion",
+    "ecommerce"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@shopify/cli": "^3.0.0",
+    "@shopify/theme": "^3.0.0"
+  },
+  "dependencies": {},
+  "shopify": {
+    "extension": {
+      "type": "theme-app-extension",
+      "name": "Virtual Try-On Widget"
+    }
+  }
+}

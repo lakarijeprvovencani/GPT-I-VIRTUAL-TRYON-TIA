@@ -1,18 +1,46 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface UploadedImage {
   file: File;
   preview: string;
 }
 
-export default function VirtualTryOn() {
+interface VTOContext {
+  productId: string | null;
+  variantId: string | null;
+  handle: string | null;
+  title: string | null;
+  price: string | null;
+  image: string | null;
+  mode: string | null;
+  source: string | null;
+  debug: boolean;
+}
+
+interface PostMessagePayload {
+  type: 'vto:result';
+  ready: boolean;
+  payload: {
+    productId: string | null;
+    variantId: string | null;
+    handle: string | null;
+    title: string | null;
+    price: string | null;
+    image: string | null;
+    resultUrl: string | null;
+    source: string | null;
+  };
+}
+
+export default function VirtualTryOn({ context }: { context: VTOContext }) {
   const [userPhoto, setUserPhoto] = useState<UploadedImage | null>(null);
   const [clothingPhoto, setClothingPhoto] = useState<UploadedImage | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastPostMessage, setLastPostMessage] = useState<PostMessagePayload | null>(null);
   
   const userPhotoRef = useRef<HTMLInputElement>(null);
   const clothingPhotoRef = useRef<HTMLInputElement>(null);
@@ -63,6 +91,9 @@ export default function VirtualTryOn() {
         const blob = await resp.blob();
         const url = URL.createObjectURL(blob);
         setGeneratedImage(url);
+        
+        // Send postMessage to parent (Shopify widget) after successful generation
+        sendPostMessage(url);
       } else if (ct.includes('application/json')) {
         const data = await resp.json();
         setError(data.message || 'Model je vratio tekstualnu poruku umesto slike');
@@ -77,6 +108,65 @@ export default function VirtualTryOn() {
     }
   };
 
+  // Function to send postMessage to parent (Shopify widget)
+  const sendPostMessage = (resultUrl: string | null) => {
+    // Better to use parentOrigin from document.referrer, fallback to '*' only for local dev
+    const parentOrigin = document.referrer ? new URL(document.referrer).origin : '*';
+    
+    const message: PostMessagePayload = {
+      type: 'vto:result',
+      ready: true,
+      payload: {
+        productId: context.productId,
+        variantId: context.variantId,
+        handle: context.handle,
+        title: context.title,
+        price: context.price,
+        image: context.image,
+        resultUrl: resultUrl,
+        source: context.source || 'web'
+      }
+    };
+
+    // Store last sent message for debug
+    setLastPostMessage(message);
+
+    // Send message to parent
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(message, parentOrigin);
+      console.log('📤 PostMessage sent to parent:', message);
+    } else {
+      console.log('📤 PostMessage would be sent (local dev):', message);
+    }
+  };
+
+  // Function to send test message (debug)
+  const sendTestMessage = () => {
+    const testMessage: PostMessagePayload = {
+      type: 'vto:result',
+      ready: true,
+      payload: {
+        productId: 'test-123',
+        variantId: 'test-456',
+        handle: 'test-product',
+        title: 'Test Product',
+        price: '99.99',
+        image: 'https://example.com/test.jpg',
+        resultUrl: 'https://example.com/result.jpg',
+        source: 'shopify'
+      }
+    };
+    
+    setLastPostMessage(testMessage);
+    
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(testMessage, '*');
+      console.log('🧪 Test PostMessage sent:', testMessage);
+    } else {
+      console.log('🧪 Test PostMessage would be sent (local dev):', testMessage);
+    }
+  };
+
   const resetForm = () => {
     setUserPhoto(null);
     setClothingPhoto(null);
@@ -86,9 +176,11 @@ export default function VirtualTryOn() {
     if (clothingPhotoRef.current) clothingPhotoRef.current.value = '';
   };
 
+  const isCompact = context.mode === 'compact';
+
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className={`bg-white rounded-2xl shadow-xl ${isCompact ? 'p-4' : 'p-8'}`}>
+      <div className={`grid ${isCompact ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-8`}>
         {/* Upload Section */}
         <div className="space-y-6">
           <div>
@@ -190,10 +282,12 @@ export default function VirtualTryOn() {
 
         {/* Result Section */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">
-            Rezultat
-          </h3>
-          <div className="border-2 border-gray-200 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
+          {!isCompact && (
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              Rezultat
+            </h3>
+          )}
+          <div className={`border-2 border-gray-200 rounded-lg ${isCompact ? 'p-4' : 'p-6'} ${isCompact ? 'min-h-[300px]' : 'min-h-[400px]'} flex items-center justify-center`}>
             {isLoading ? (
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -225,6 +319,38 @@ export default function VirtualTryOn() {
           </div>
         </div>
       </div>
+
+      {/* Debug Panel - only show when ?debug=1 */}
+      {context.debug && (
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white p-4 rounded-lg shadow-xl max-w-sm z-50">
+          <h4 className="font-semibold mb-3 text-yellow-400">🐛 Debug Panel</h4>
+          
+          <div className="space-y-3 text-sm">
+            <div>
+              <strong>Context:</strong>
+              <pre className="bg-gray-800 p-2 rounded mt-1 text-xs overflow-auto">
+                {JSON.stringify(context, null, 2)}
+              </pre>
+            </div>
+            
+            <button
+              onClick={sendTestMessage}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded text-xs"
+            >
+              🧪 Pošalji Test Poruku
+            </button>
+            
+            {lastPostMessage && (
+              <div>
+                <strong>Last PostMessage:</strong>
+                <pre className="bg-gray-800 p-2 rounded mt-1 text-xs overflow-auto">
+                  {JSON.stringify(lastPostMessage, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

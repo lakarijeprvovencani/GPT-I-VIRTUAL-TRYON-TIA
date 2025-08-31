@@ -1,0 +1,273 @@
+/* Virtual Try-On Widget Styles */
+
+.vto-widget {
+  margin: 20px 0;
+  text-align: center;
+}
+
+/* Product Card Styles */
+.vto-product-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f9f9f9;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.vto-product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 15px;
+}
+
+.vto-product-info {
+  text-align: left;
+  flex: 1;
+}
+
+.vto-product-title {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.vto-product-price {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #007cba;
+}
+
+/* Button Styles */
+.vto-try-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.vto-button--primary {
+  background-color: #007cba;
+  color: white;
+}
+
+.vto-button--primary:hover {
+  background-color: #005a87;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+}
+
+.vto-button--secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.vto-button--secondary:hover {
+  background-color: #545b62;
+  transform: translateY(-2px);
+}
+
+.vto-button--outline {
+  background-color: transparent;
+  color: #007cba;
+  border: 2px solid #007cba;
+}
+
+.vto-button--outline:hover {
+  background-color: #007cba;
+  color: white;
+}
+
+/* Modal Styles */
+.vto-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.vto-modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.vto-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.vto-modal-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.vto-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.vto-modal-close:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.vto-modal-body {
+  flex: 1;
+  padding: 0;
+  overflow: hidden;
+}
+
+.vto-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.vto-order-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #28a745;
+  color: white;
+}
+
+.vto-order-button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .vto-modal {
+    padding: 10px;
+  }
+  
+  .vto-modal-content {
+    max-height: 95vh;
+  }
+  
+  .vto-modal-header,
+  .vto-modal-footer {
+    padding: 15px 20px;
+  }
+  
+  .vto-modal-title {
+    font-size: 18px;
+  }
+  
+  .vto-try-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .vto-product-card {
+    max-width: 250px;
+    padding: 12px;
+  }
+  
+  .vto-product-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .vto-product-title {
+    font-size: 13px;
+  }
+  
+  .vto-product-price {
+    font-size: 14px;
+  }
+}
+
+/* Animation for modal */
+.vto-modal {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.vto-modal[style*="display: flex"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.vto-modal-content {
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.vto-modal[style*="display: flex"] .vto-modal-content {
+  transform: scale(1);
+}
+
+/* Loading state for iframe */
+.vto-iframe {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.vto-iframe.loaded {
+  opacity: 1;
+}
+
+/* Custom properties for theme customization */
+:root {
+  --vto-primary-color: #007cba;
+  --vto-secondary-color: #6c757d;
+  --vto-success-color: #28a745;
+  --vto-border-radius: 6px;
+  --vto-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --vto-transition: all 0.3s ease;
+}

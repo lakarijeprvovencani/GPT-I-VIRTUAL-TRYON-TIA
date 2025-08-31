@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Try-On Widget Demo</title>
+    <link rel="stylesheet" href="assets/virtual-try-on-widget.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .demo-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .product-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        .product-details h2 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .product-details p {
+            margin: 0 0 5px 0;
+            color: #666;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007cba;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🛍️ Virtual Try-On Widget Demo</h1>
+        <p>Ovo je demo stranica za testiranje Virtual Try-On Widget-a koji će se koristiti u Shopify theme-u.</p>
+    </div>
+
+    <div class="demo-container">
+        <h2>📦 Product Information</h2>
+        <div class="product-info">
+            <img src="https://via.placeholder.com/100x100/007cba/ffffff?text=T" alt="Product" class="product-image">
+            <div class="product-details">
+                <h2>Test Product - Virtual Try-On</h2>
+                <p><strong>Product ID:</strong> 12345</p>
+                <p><strong>Variant ID:</strong> 67890</p>
+                <p><strong>Handle:</strong> test-product-virtual-tryon</p>
+                <p class="product-price">$99.99</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Virtual Try-On Widget -->
+    <div class="demo-container">
+        <h2>🎯 Virtual Try-On Widget</h2>
+        <p>Kliknite na dugme "Isprobaj" da otvorite Virtual Try-On modal:</p>
+        
+        <div class="vto-widget" 
+             data-product-id="12345"
+             data-variant-id="67890"
+             data-product-handle="test-product-virtual-tryon"
+             data-product-title="Test Product - Virtual Try-On"
+             data-product-price="99.99"
+             data-product-image="https://via.placeholder.com/300x300/007cba/ffffff?text=T"
+             data-compact-mode="false">
+          
+          <div class="vto-product-card">
+            <img src="https://via.placeholder.com/100x100/007cba/ffffff?text=T" 
+                 alt="Test Product" 
+                 class="vto-product-image">
+            <div class="vto-product-info">
+              <h4 class="vto-product-title">Test Product - Virtual Try-On</h4>
+              <p class="vto-product-price">$99.99</p>
+            </div>
+          </div>
+
+          <button type="button" 
+                  class="vto-try-button vto-button--primary"
+                  onclick="openVirtualTryOn()">
+            Isprobaj
+          </button>
+
+          <!-- Virtual Try-On Modal -->
+          <div id="vto-modal" class="vto-modal" style="display: none;">
+            <div class="vto-modal-content">
+              <div class="vto-modal-header">
+                <h3 class="vto-modal-title">Virtual Try-On</h3>
+                <button type="button" class="vto-modal-close" onclick="closeVirtualTryOn()">&times;</button>
+              </div>
+              
+              <div class="vto-modal-body">
+                <iframe id="vto-iframe" 
+                        src="https://gpt-virtual-tryon-tia.netlify.app?mode=compact&source=shopify&productId=12345&variantId=67890&handle=test-product-virtual-tryon&title=Test%20Product%20-%20Virtual%20Try-On&price=99.99&image=https://via.placeholder.com/300x300/007cba/ffffff?text=T"
+                        frameborder="0"
+                        allow="camera; microphone"
+                        style="width: 100%; height: 600px; border: none;">
+                </iframe>
+              </div>
+              
+              <div class="vto-modal-footer">
+                <button type="button" 
+                        id="vto-order-button" 
+                        class="vto-order-button vto-button--primary"
+                        style="display: none;"
+                        onclick="handleOrder()">
+                  Poruči
+                </button>
+                <button type="button" 
+                        class="vto-button vto-button--secondary"
+                        onclick="closeVirtualTryOn()">
+                  Zatvori
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="demo-container">
+        <h2>🧪 Testiranje</h2>
+        <p><strong>Test 1:</strong> Kliknite "Isprobaj" da otvorite modal</p>
+        <p><strong>Test 2:</strong> Modal treba da prikaže iframe sa Netlify aplikacijom</p>
+        <p><strong>Test 3:</strong> Kada se virtual try-on završi, "Poruči" dugme treba da se aktivira</p>
+        <p><strong>Test 4:</strong> Klik na "Poruči" treba da simulira navigaciju na product page</p>
+        
+        <button type="button" onclick="simulateVTOComplete()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          🧪 Simuliraj VTO Complete
+        </button>
+    </div>
+
+    <script>
+      // Listen for postMessage from iframe
+      window.addEventListener('message', function(event) {
+        if (event.origin !== 'https://gpt-virtual-tryon-tia.netlify.app') return;
+        
+        if (event.data.type === 'vto:result' && event.data.ready === true) {
+          // Show order button when virtual try-on is complete
+          const orderButton = document.getElementById('vto-order-button');
+          if (orderButton) {
+            orderButton.style.display = 'inline-block';
+            console.log('✅ Virtual Try-On completed! Order button activated.');
+          }
+        }
+      });
+
+      function openVirtualTryOn() {
+        const modal = document.getElementById('vto-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+          console.log('🚀 Modal opened');
+        }
+      }
+
+      function closeVirtualTryOn() {
+        const modal = document.getElementById('vto-modal');
+        if (modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          
+          // Hide order button when closing
+          const orderButton = document.getElementById('vto-order-button');
+          if (orderButton) {
+            orderButton.style.display = 'none';
+          }
+          console.log('🔒 Modal closed');
+        }
+      }
+
+      function handleOrder() {
+        const variantId = document.querySelector('.vto-widget').dataset.variantId;
+        const productHandle = document.querySelector('.vto-widget').dataset.productHandle;
+        
+        console.log('🛒 Order button clicked!');
+        console.log('Variant ID:', variantId);
+        console.log('Product Handle:', productHandle);
+        
+        // Simulate navigation to product page
+        alert(`Navigacija na product page:\nProduct: ${productHandle}\nVariant: ${variantId}`);
+        
+        // In real implementation, this would navigate to:
+        // window.location.href = `/products/${productHandle}?variant=${variantId}`;
+      }
+
+      // Close modal when clicking outside
+      document.getElementById('vto-modal').addEventListener('click', function(event) {
+        if (event.target === this) {
+          closeVirtualTryOn();
+        }
+      });
+
+      // Simulate VTO completion for testing
+      function simulateVTOComplete() {
+        console.log('🧪 Simulating VTO completion...');
+        
+        // Simulate postMessage from iframe
+        const event = new MessageEvent('message', {
+          origin: 'https://gpt-virtual-tryon-tia.netlify.app',
+          data: {
+            type: 'vto:result',
+            ready: true
+          }
+        });
+        
+        window.dispatchEvent(event);
+        console.log('✅ VTO completion simulated!');
+      }
+
+      // Add iframe load event
+      document.getElementById('vto-iframe').addEventListener('load', function() {
+        console.log('🖼️ Iframe loaded');
+        this.classList.add('loaded');
+      });
+    </script>
+</body>
+</html>
